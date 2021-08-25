@@ -4,16 +4,21 @@ import {
 	WebGLRenderer,
 	Color,
 	BoxGeometry,
+	CylinderGeometry,
 	SphereGeometry,
 	MeshStandardMaterial,
 	Mesh,
 	DirectionalLight,
 	AmbientLight,
 	MeshLambertMaterial,
+	Group,
+	DoubleSide,
+	PlaneGeometry,
+	MeshBasicMaterial,
 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
-let scene, camera, renderer, box, sphere, jenga;
+let scene, camera, renderer, cylinder, sphere, jenga;
 
 init();
 
@@ -51,26 +56,32 @@ function init(){
 	scene.add(ambientLight);
 
 	//create objects
-	//box
-	const heightBoxGeometry = 1.2;
-	const boxGeometry = new BoxGeometry(0.5, heightBoxGeometry, 0.5);
-	const boxMaterial = new MeshStandardMaterial({color:new Color('#cc113c')});
-	box = new Mesh(boxGeometry, boxMaterial);
-	box.position.set(3, (heightBoxGeometry / 2), -0.5);
-	scene.add(box);
+
+	//group cylinder and sphere into one mesh
+	const capsuleI = new Group();
+
+	//cylinder
+	const heightCylinderGeometry = 1.3;
+	const cylinderGeometry = new CylinderGeometry(0.005, 0.6, heightCylinderGeometry, 10, 1);
+	const cylinderMaterial = new MeshStandardMaterial({color:new Color('#cc113c')});
+	cylinder = new Mesh(cylinderGeometry, cylinderMaterial);
+	cylinder.position.set(3, (heightCylinderGeometry / 2), -0.5);
+	capsuleI.add(cylinder);
 
 	//sphere
 	const heightSphereGeometry = 35;
 	const sphereGeometry = new SphereGeometry(0.22, 35, heightSphereGeometry, 0, 8, 0);
 	const sphereMaterial = new MeshStandardMaterial({color:new Color('#c2253c')});
 	sphere = new Mesh(sphereGeometry, sphereMaterial);
-	sphere.position.set(3, (heightBoxGeometry + 0.5), -0.5)
-	scene.add(sphere);
+	sphere.position.set(3, (heightCylinderGeometry + 0.3), -0.5)
+	capsuleI.add(sphere);
+
+	scene.add(capsuleI);
 
 	//jenga
 	const heightJengaGeometry = 0.4;
 	const jengaGeometry = new BoxGeometry(3, heightJengaGeometry, 0.9);
-	const jengaMaterial = new MeshLambertMaterial({color:0x44b47});
+	const jengaMaterial = new MeshLambertMaterial({color:0x44b47, side: DoubleSide});
 	jenga = new Mesh(jengaGeometry, jengaMaterial);
 
 	for (let row = 0; row < 10; row++) {
@@ -92,13 +103,23 @@ function init(){
 		}
 	}
 
+	//ground
+	const heightGround = 1;
+	const groundGeometry = new BoxGeometry( 20, heightGround, 20 );
+	const groundMaterial = new MeshBasicMaterial( {color: '#252525', side: DoubleSide} );
+	const ground = new Mesh( groundGeometry, groundMaterial );
+	ground.rotation.y = -(Math.PI / 2);
+	ground.position.y -= heightGround / 2;
+
+	scene.add( ground );
+
 	update();
 }
 
 function update(){
 	requestAnimationFrame( update );
-	box.rotation.y -= 0.01;
-	sphere.rotation.y += 0.01;
+	cylinder.rotation.y -= 0.01;
+
 	renderer.render( scene, camera );
 }
 
