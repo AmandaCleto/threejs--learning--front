@@ -25,7 +25,7 @@ init();
 function init(){
 	//create scene
 	scene = new Scene();
-	scene.background = new Color(0xcccccc);
+	scene.background = new Color(0x000000);
 
 	//create camera
 	camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
@@ -112,6 +112,30 @@ function init(){
 	ground.position.y -= heightGround / 2;
 
 	scene.add( ground );
+
+
+
+	//lamp-post
+	//base-lamp-post
+	const heightBaseLampPost = 0.5;
+	const baseLampPostGeometry = new CylinderGeometry( 0.1, 0.3, heightBaseLampPost, 6, 1 );
+	const baseLampPostMaterial = new MeshBasicMaterial( {color: '#ccc'} );
+	const baseLampPost = new Mesh( baseLampPostGeometry, baseLampPostMaterial );
+	baseLampPost.position.y += heightBaseLampPost / 2;
+	baseLampPost.position.x = 2;
+	baseLampPost.position.z = -1;
+	scene.add( baseLampPost );
+
+	//trunk-lamp-post
+	const heightTrunkLampPost = 3.8;
+	const baseTrunkPostGeometry = new CylinderGeometry( 0.1, 0.1, heightTrunkLampPost, 6, 1 );
+	const baseTrunkPostMaterial = new MeshBasicMaterial( {color: '#ccc'} );
+	const baseTrunkPost = new Mesh( baseTrunkPostGeometry, baseTrunkPostMaterial );
+	baseTrunkPost.position.y += heightTrunkLampPost / 2;
+	baseTrunkPost.position.x = 2;
+	baseTrunkPost.position.z = -1;
+	scene.add( baseTrunkPost );
+
 
 	update();
 }
