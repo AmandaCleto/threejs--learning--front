@@ -13,12 +13,13 @@ import {
 	MeshLambertMaterial,
 	Group,
 	DoubleSide,
-	PlaneGeometry,
 	MeshBasicMaterial,
+	PointLight,
+	TorusGeometry
 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
-let scene, camera, renderer, cylinder, sphere, jenga;
+let scene, camera, renderer, cylinder, sphere, building;
 
 init();
 
@@ -39,9 +40,9 @@ function init(){
 
 	//create controls
 	const controls = new OrbitControls( camera, renderer.domElement );
-	controls.target.set(0,0,0);
-	controls.minDistance = 5;
-	controls.maxDistance = 20;
+	controls.target.set(-20,-20,10);
+	controls.minDistance = 80;
+	controls.maxDistance = 100;
 	controls.update();
 
 	//create light
@@ -58,38 +59,38 @@ function init(){
 	//create objects
 
 	//group cylinder and sphere into one mesh
-	const capsuleI = new Group();
+	const capsulePerson = new Group();
 
 	//cylinder
-	const heightCylinderGeometry = 1.3;
-	const cylinderGeometry = new CylinderGeometry(0.005, 0.6, heightCylinderGeometry, 10, 1);
-	const cylinderMaterial = new MeshStandardMaterial({color:new Color('#cc113c')});
-	cylinder = new Mesh(cylinderGeometry, cylinderMaterial);
-	cylinder.position.set(3, (heightCylinderGeometry / 2), -0.5);
-	capsuleI.add(cylinder);
+	const personCylinderHeight = 5;
+	const personCylinderGeometry = new CylinderGeometry(0.005, 2, personCylinderHeight, 10, 1);
+	const personCylinderMaterial = new MeshStandardMaterial({color:new Color('#cc113c')});
+	cylinder = new Mesh(personCylinderGeometry, personCylinderMaterial);
+	cylinder.position.set(20, (personCylinderHeight / 2), -0.5);
+	capsulePerson.add(cylinder);
 
 	//sphere
-	const heightSphereGeometry = 35;
-	const sphereGeometry = new SphereGeometry(0.22, 35, heightSphereGeometry, 0, 8, 0);
-	const sphereMaterial = new MeshStandardMaterial({color:new Color('#c2253c')});
-	sphere = new Mesh(sphereGeometry, sphereMaterial);
-	sphere.position.set(3, (heightCylinderGeometry + 0.3), -0.5)
-	capsuleI.add(sphere);
+	const heightHeadSphereGeometry = 40;
+	const headSphereGeometry = new SphereGeometry(1, 10, heightHeadSphereGeometry, 0, 8, 0);
+	const headSphereMaterial = new MeshStandardMaterial({color:new Color('#c2253c')});
+	sphere = new Mesh(headSphereGeometry, headSphereMaterial);
+	sphere.position.set(20, (personCylinderHeight + 0.3), -0.5)
+	capsulePerson.add(sphere);
 
-	scene.add(capsuleI);
+	scene.add(capsulePerson);
 
-	//jenga
-	const heightJengaGeometry = 0.4;
-	const jengaGeometry = new BoxGeometry(3, heightJengaGeometry, 0.9);
-	const jengaMaterial = new MeshLambertMaterial({color:0x44b47, side: DoubleSide});
-	jenga = new Mesh(jengaGeometry, jengaMaterial);
+	//buiding
+	const heightBuildingGeometry = 3;
+	const buildingGeometry = new BoxGeometry(20, heightBuildingGeometry, 20);
+	const buildingMaterial = new MeshLambertMaterial({color:0x44b47, side: DoubleSide});
+	building = new Mesh(buildingGeometry, buildingMaterial);
 
 	for (let row = 0; row < 10; row++) {
-		let positionY = (row * (heightJengaGeometry + 0.05)) + heightJengaGeometry / 2;
+		let positionY = (row * (heightBuildingGeometry)) + heightBuildingGeometry / 2;
 		let offset = -1;
 
 		for (let count = 0; count < 3; count++) {
-			const rowBlock = jenga.clone();
+			const rowBlock = building.clone();
 
 			if (row % 2) {
 				rowBlock.rotation.y = Math.PI/2;
@@ -104,8 +105,9 @@ function init(){
 	}
 
 	//ground
-	const heightGround = 1;
-	const groundGeometry = new BoxGeometry( 20, heightGround, 20 );
+	const heightGround = 5;
+	const widthGround = 100;
+	const groundGeometry = new BoxGeometry( widthGround, heightGround, widthGround );
 	const groundMaterial = new MeshBasicMaterial( {color: '#252525', side: DoubleSide} );
 	const ground = new Mesh( groundGeometry, groundMaterial );
 	ground.rotation.y = -(Math.PI / 2);
@@ -113,29 +115,76 @@ function init(){
 
 	scene.add( ground );
 
-
-
 	//lamp-post
 	//base-lamp-post
-	const heightBaseLampPost = 0.5;
-	const baseLampPostGeometry = new CylinderGeometry( 0.1, 0.3, heightBaseLampPost, 6, 1 );
+	const capsuleLampPost = new Group();
+
+	const heightBaseLampPost = 2;
+	const baseLampPostGeometry = new CylinderGeometry( 0.5, 1.5, heightBaseLampPost, 6, 1 );
 	const baseLampPostMaterial = new MeshBasicMaterial( {color: '#ccc'} );
 	const baseLampPost = new Mesh( baseLampPostGeometry, baseLampPostMaterial );
-	baseLampPost.position.y += heightBaseLampPost / 2;
-	baseLampPost.position.x = 2;
-	baseLampPost.position.z = -1;
-	scene.add( baseLampPost );
+	baseLampPost.position.set(15, (heightBaseLampPost / 2), -8);
+	capsuleLampPost.add(baseLampPost);
 
 	//trunk-lamp-post
-	const heightTrunkLampPost = 3.8;
-	const baseTrunkPostGeometry = new CylinderGeometry( 0.1, 0.1, heightTrunkLampPost, 6, 1 );
+	const heightTrunkLampPost = 25;
+	const baseTrunkPostGeometry = new CylinderGeometry( 0.3, 0.3, heightTrunkLampPost, 6, 1 );
 	const baseTrunkPostMaterial = new MeshBasicMaterial( {color: '#ccc'} );
 	const baseTrunkPost = new Mesh( baseTrunkPostGeometry, baseTrunkPostMaterial );
-	baseTrunkPost.position.y += heightTrunkLampPost / 2;
-	baseTrunkPost.position.x = 2;
-	baseTrunkPost.position.z = -1;
-	scene.add( baseTrunkPost );
+	baseTrunkPost.position.set(15, (heightTrunkLampPost / 2), -8);
+	capsuleLampPost.add(baseTrunkPost);
 
+	//top-base-post
+	const heightTopBasePost = 1;
+	const topBasePostGeometry = new CylinderGeometry( 0.2, 1, heightTopBasePost, 8, 1, true );
+	const topBasePostMaterial = new MeshBasicMaterial( {color: '#cccccc', side: DoubleSide} );
+	const topBasePost = new Mesh( topBasePostGeometry, topBasePostMaterial );
+	topBasePost.position.set(17,  24.7 + (heightTopBasePost / 2), -5.5);
+	capsuleLampPost.add(topBasePost);
+
+	//top-base-circle-post
+	const heightTopBaseSpherePost = 0.3;
+	const topBasePostSphereGeometry = new SphereGeometry(heightTopBaseSpherePost, 10, 10);
+	const topBasePostSphereMaterial = new MeshBasicMaterial( {color: '#cccccc', side: DoubleSide} );
+	const topBasePostSphere = new Mesh( topBasePostSphereGeometry, topBasePostSphereMaterial );
+	topBasePostSphere.position.set(17,  25.7 + (heightTopBaseSpherePost / 2), -5.5);
+	capsuleLampPost.add(topBasePostSphere);
+
+	//lamp-post
+	const heightLampPost = 0.3;
+	const lampPostGeometry = new SphereGeometry(heightLampPost, 10, 10);
+	const lampPostMaterial = new MeshBasicMaterial( {color: '#FFF615', side: DoubleSide} );
+	const lampPost = new Mesh( lampPostGeometry, lampPostMaterial );
+	lampPost.position.set(17,  24.7 + (heightLampPost / 2), -5.5);
+	capsuleLampPost.add(lampPost);
+
+	//light for lamp
+	const pointLight = new PointLight( 0xfff612, 2, 20, -10 );
+	pointLight.position.set(17,  24.7 + (heightLampPost / 2), -5.5);
+	capsuleLampPost.add(pointLight);
+
+	//helper
+	// const sphereSize = 1;
+	// const pointLightHelper = new PointLightHelper( pointLight, sphereSize );
+	// capsuleLampPost.add( pointLightHelper );
+
+	//torus
+	const torusGeometry = new TorusGeometry( 1, .3, 6, 7, 1.6);
+	const torusMaterial = new MeshBasicMaterial( { color: 0xcccccc } );
+	const torus = new Mesh( torusGeometry, torusMaterial );
+	torus.position.set(15.7,  12.45 + (heightTrunkLampPost / 2), -7.2);
+	torus.rotation.y = 2.3;
+	capsuleLampPost.add(torus);
+
+	const torusLampConnectionGeometry = new CylinderGeometry( 0.3, 0.3, 5, 32);
+	const torusLampConnectionMaterial = new MeshBasicMaterial( { color: 0xcccccc } );
+	const torusConnection = new Mesh( torusLampConnectionGeometry, torusLampConnectionMaterial );
+	torusConnection.position.set(15.5,  13.4 + (heightTrunkLampPost / 2), -7.3);
+	torusConnection.rotation.x = 1.6;
+	torusConnection.rotation.z = -0.7;
+	capsuleLampPost.add( torusConnection );
+
+	scene.add(capsuleLampPost)
 
 	update();
 }
